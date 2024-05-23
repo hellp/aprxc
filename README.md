@@ -39,7 +39,7 @@ defaults of `0.1` for both values seem to strike a good balance (and a memorable
 inaccuracy of ~1%). Epsilon is the 'main manipulation knob', and you can see
 quite good how its value affects especially the maximum inaccuracy.
 
-(For this overview I counted 10 million unique 32-character strings, and _for
+(For this overview I counted 10 million unique 32-character strings[^1], and _for
 each_ iteration I checked the reported count and compared to the actual number
 of unique items. 'Mean inacc.' is the mean inaccuracy across all 10M steps;
 'max inacc.' is the highest off encountered; memory usage is the linux tool
@@ -111,3 +111,12 @@ options:
   --top TOP, -t TOP     EXPERIMENTAL: Show X most common values (default: 0)
   --verbose, -v
 ```
+
+---
+
+[^1]:
+    The benchmark script:
+
+    ```shell
+    cat /dev/urandom | pv -q -L 1000M | base64 -w 32 | command time ./aprxc.py --debug --epsilon=0.1 --delta=0.1
+    ```
