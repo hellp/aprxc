@@ -46,7 +46,7 @@ of unique items. 'Mean inacc.' is the mean inaccuracy across all 10M steps;
 `time`'s reported 'maxresident'; time usage is wall time.)
 
 |   𝜀  |  𝛿  | set size | mean inacc. | max inacc.  |   memory usage  |  time usage  |
-| ---- | --- | -------- | ----------- | ----------- | --------------- | ------------ |
+| ---- | --- | --------:| ----------- | ----------- | ---------------:| ------------:|
 | 0.01 | 0.1 |  8318632 |     0.004%  |     0.034%  | 1155MiB (4418%) | 12.5s (162%) |
 | 0.05 | 0.1 |   332746 |     0.17%   |     0.43%   |   70MiB  (269%) |  9.5s (123%) |
 | 0.1  | 0.1 |    83187 |   __0.37%__ |   __0.97%__ |   26MiB  (100%) |  7.7s (100%) |
