@@ -28,7 +28,7 @@ bought with **an inaccuracy in the reported counts**.
 
 ## About inaccuracy
 
-But how inaccurate? In it's default configuration you'll get a **mean inaccuracy
+But how inaccurate? In its default configuration you'll get a **mean inaccuracy
 of about 0,4%**, with occasional **outliers around 1%**. For example, if the
 script encounters 10M (`10_000_000`) actual unique values, the reported count is
 typically ~40k off (e.g. `10_038_680`), sometimes ~100k (e.g. `9_897_071`).
