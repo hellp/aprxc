@@ -16,21 +16,6 @@ class ApproxiCount:
     Streams: An Algorithm for the (Text) Book"
     (https://arxiv.org/pdf/2301.10191#section.2).
 
-    It is similar to what the command line "sort/uniq" pipeline (`| sort | uniq
-    -c | wc -l`) does, or alternatively `awk '!a[$0]++' | wc -l`.
-
-    Compared to sort/uniq:
-
-    - sort/uniq always uses less memory (about 30-50%).
-    - sort/uniq is about 5 times *slower*.
-
-    Compared to 'the awk construct':
-
-    - awk uses about the same amount of time (0.5x-2x).
-    - awk uses *much more* memory for large files. Basically linear to the file
-      size, while ApproxiCount has an upper bound. For typical multi-GiB files
-      this can mean factors of 20x-150x, e.g. 5GiB (awk) vs. 40MiB (aprxc).
-
     """
 
     def __init__(
