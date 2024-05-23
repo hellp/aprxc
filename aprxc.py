@@ -25,6 +25,8 @@ class ApproxiCount:
         e: float = 0.1,
         d: float = 0.1,
         top: int = 0,
+        cheat: bool = True,
+        _debug: bool = False,
     ):
 
         self.n = min(m, int(math.ceil((12 / e**2) * math.log((8 * m) / d, 2))))
@@ -32,8 +34,13 @@ class ApproxiCount:
         self._total: int = 0
         self._memory = set()
 
+        self.cheat = cheat
         self.top = top
         self._counters = Counter()
+
+        self._debug = _debug
+        self._mean_inacc = 0.0
+        self._max_inacc = 0.0
 
     def count(self, item: Hashable):
         self._total += 1
@@ -51,16 +58,30 @@ class ApproxiCount:
             if self.top:
                 self._counters = Counter(dict(self._counters.most_common(self.n)))
 
+        if self._debug:
+            self._print_debug()
+
+    def _print_debug(self):
+        inacc = abs((self._total - self.unique) / self._total)
+        self._mean_inacc = (
+            (self._mean_inacc * (self._total - 1)) + inacc
+        ) / self._total
+        self._max_inacc = max(self._max_inacc, inacc)
+        if self._total % 50_000 == 0:
+            print(
+                f"{self._total=} {self.unique=} {self._round=}"
+                f" {self.n} {len(self._memory)=}"
+                f" {inacc=:.2%} (mean: {self._mean_inacc:.3%} max: {self._max_inacc:.3%})"
+            )
+
     @property
     def unique(self) -> int:
-        # Here we diverge slightly from the paper's algorithm: normally it
-        # overestimates in 50%, and underestimates in 50% of cases. But as we
-        # count the total number of items seen, we can use that as an upper
-        # bound of possible unique values.
-        return min(
-            self._total,
-            int(len(self._memory) / (1 / 2 ** (self._round))),
-        )
+        # If `cheat` is True, we diverge slightly from the paper's algorithm:
+        # normally it overestimates in 50%, and underestimates in 50% of cases.
+        # But as we count the total number of items seen, we can use that as an
+        # upper bound of possible unique values.
+        result = int(len(self._memory) / (1 / 2 ** (self._round)))
+        return min(self._total, result) if self.cheat else result
 
     def is_exact(self) -> bool:
         # During the first round, i.e. before the first random cleanup of our
@@ -75,6 +96,8 @@ class ApproxiCount:
     def from_iterable(cls, iterable, **kw) -> Self:
         inst = cls(**kw)
         for x in iterable:
+            if inst._debug and inst._total > 10_000_000:
+                break
             inst.count(x)
         return inst
 
@@ -101,9 +124,16 @@ parser.add_argument(
     default=sys.maxsize,
     help="Total amount of data items, if known in advance. (Can be approximated.)",
 )
-parser.add_argument("--delta", "-D", type=float, default=0.1)
 parser.add_argument("--epsilon", "-E", type=float, default=0.1)
+parser.add_argument("--delta", "-D", type=float, default=0.1)
+parser.add_argument(
+    "--cheat",
+    action=argparse.BooleanOptionalAction,
+    default=True,
+    help="Use 'total seen' number as upper bound for unique count.",
+)
 parser.add_argument("--verbose", "-v", action="store_true")
+parser.add_argument("--debug", action="store_true")
 
 config = parser.parse_args()
 
@@ -115,6 +145,8 @@ if __name__ == "__main__":
         e=config.epsilon,
         d=config.delta,
         top=config.top,
+        cheat=config.cheat,
+        _debug=config.debug,
     )
     print(
         " ".join(

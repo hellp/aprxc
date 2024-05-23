@@ -99,17 +99,19 @@ It kinda works, but…
 ## Command-line interface:
 
 ```shell
-usage: aprxc [-h] [--top TOP] [--size SIZE] [--delta DELTA] [--epsilon EPSILON] [--verbose]
+usage: aprxc [-h] [--top TOP] [--size SIZE] [--epsilon EPSILON] [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--debug]
 
 Get an *estimation* of distinct lines in a data stream.
 
 options:
   -h, --help            show this help message and exit
-  --size SIZE, -s SIZE  Total amount of data items, if known in advance. (Can be approximated.) (default: 9223372036854775807)
-  --delta DELTA, -D DELTA
-  --epsilon EPSILON, -E EPSILON
   --top TOP, -t TOP     EXPERIMENTAL: Show X most common values (default: 0)
+  --size SIZE, -s SIZE  Total amount of data items, if known in advance. (Can be approximated.) (default: 9223372036854775807)
+  --epsilon EPSILON, -E EPSILON
+  --delta DELTA, -D DELTA
+  --cheat, --no-cheat   Use 'total seen' number as upper bound for unique count. (default: True)
   --verbose, -v
+  --debug
 ```
 
 ---
