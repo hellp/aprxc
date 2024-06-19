@@ -1,4 +1,10 @@
 #!/usr/bin/env python
+#
+# Copyright © 2024 Fabian Neumann
+# Licensed under the European Union Public Licence (EUPL).
+# https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
+# SPDX-License-Identifier: EUPL-1.2
+
 from collections import Counter
 from collections.abc import Hashable
 from random import getrandbits
