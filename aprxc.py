@@ -104,7 +104,8 @@ class ApproxiCount:
     def from_iterable(cls, iterable: Iterable, /, **kw) -> Self:
         inst = cls(**kw)
         for x in iterable:
-            if inst._debug and inst._total > 10_000_000:
+            if inst._debug and inst._total > 10_000_000:  # noqa: PLR2004
+                inst._print_debug()
                 break
             inst.count(x)
         return inst
