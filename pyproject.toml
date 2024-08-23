@@ -1,0 +1,43 @@
+[project]
+name = "aprxc"
+version = "1.0.0"
+description = "A command-line tool to estimate the number of distinct lines in a file/stream using Chakraborty/Vinodchandran/Meel’s approximation algorithm."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+keywords = []
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Utilities",
+]
+
+[project.scripts]
+aprxc = "aprxc:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/test-data",
+  "/workspace.code-workspace",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [   # inspired by attrs :)
+  "ANN",     # Mypy is better at this
+  "COM",     # Black takes care of our commas
+  "D",       # We prefer our own docstring style.
+  "E501",    # leave line-length enforcement to Black
+  "PLR0913", # yes, many arguments, but most have defaults
+  "SLF001",  # private members are accessed by friendly functions
+]
