@@ -117,14 +117,13 @@ def run() -> None:
     parser = argparse.ArgumentParser(
         prog="aprxc",
         description="Estimate the number of distinct lines in a file or stream.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "path",
         type=argparse.FileType("r"),
         default=[sys.stdin],
         nargs="*",
-        help="Input file path(s) and/or '-' for stdin",
+        help="Input file path(s) and/or '-' for stdin (default: stdin)",
     )
     parser.add_argument(
         "--top",
