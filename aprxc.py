@@ -12,6 +12,7 @@ from collections import Counter
 from collections.abc import Hashable, Iterable
 from itertools import chain
 from random import getrandbits
+from textwrap import dedent
 from typing import Self
 
 
@@ -117,7 +118,19 @@ Aprxc = ApproxiCount
 def run() -> None:
     parser = argparse.ArgumentParser(
         prog="aprxc",
-        description="Estimate the number of distinct lines in a file or stream.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=dedent(
+            """
+            Estimate the number of distinct lines in a file or stream.
+
+            Motivation:
+            Easier to remember and always faster than `sort | uniq -c | wc -l`.
+            Uses a fixed amount of memory for huge datasets, unlike the
+            ever-growing footprint of `awk '!a[$0]++' | wc -l`.
+            Counts accurately for the first ~83k unique values (on 64-bit
+            systems), with a deviation of about 0.4-1% after that.
+            """
+        ),
     )
     parser.add_argument(
         "path",

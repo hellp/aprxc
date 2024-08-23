@@ -1,13 +1,16 @@
 # `aprxc` (ApproxiCount)
 
-A Python script/class to approximate the number of distinct values in a stream
-of elements using the *F0-Estimator* algorithm by S. Chakraborty, N. V.
-Vinodchandran and K. S. Meel, as described in their 2023 paper "Distinct
-Elements in Streams: An Algorithm for the (Text) Book"
+A command-line tool (and Python class) to approximate the number of distinct
+elements in files (or a stream) using the *F0-Estimator* algorithm by S.
+Chakraborty, N. V. Vinodchandran and K. S. Meel, as described in their 2023
+paper "Distinct Elements in Streams: An Algorithm for the (Text) Book"
 (https://arxiv.org/pdf/2301.10191#section.2).
 
-It is similar to what the command line pipelines `sort | uniq -c | wc -l`, or
-alternatively `awk '!a[$0]++' | wc -l`, do.
+**Motivation (elevator pitch):** Easier to remember and always faster than `sort
+| uniq -c | wc -l`. Uses a fixed amount of memory for huge datasets, unlike the
+ever-growing footprint of `awk '!a[$0]++' | wc -l`. Counts accurately for the
+first ~83k unique elements (on 64-bit systems), with a deviation of about 0.4–1%
+after that.
 
 ## Installation
 
@@ -83,7 +86,7 @@ will become estimations.
 ### Is it useful?
 
 - You have to be okay with the inaccuracies, obviously.
-- However, for small unique counts (less than 80k) the numbers are correct and
+- However, for small unique counts (less than 80k) the numbers are accurate and
   the command might be easier to remember than the sort/uniq pipe or the awkward
   awk construct.
 - It's basically always faster than the sort/uniq pipe.
