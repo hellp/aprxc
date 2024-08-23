@@ -3,9 +3,9 @@ name = "aprxc"
 version = "1.0.0"
 description = "A command-line tool to estimate the number of distinct lines in a file/stream using Chakraborty/Vinodchandran/Meel’s approximation algorithm."
 readme = "README.md"
+authors = [{name = "Fabian Neumann", email = "dev@fabianneumann.de"}]
 requires-python = ">=3.11"
 dependencies = []
-keywords = []
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -17,9 +17,19 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Mathematics",
   "Topic :: Utilities",
 ]
+keywords = [
+  "algorithm",
+  "cli",
+  "computer-science",
+  "math",
+]
 
 [project.scripts]
 aprxc = "aprxc:run"
+
+[project.urls]
+Codeberg = "https://codeberg.org/fa81/aprxc"
+GitHub = "https://github.com/hellp/aprxc"
 
 [build-system]
 requires = ["hatchling"]
