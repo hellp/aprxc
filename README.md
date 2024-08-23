@@ -99,17 +99,20 @@ It kinda works, but…
 ## Command-line interface:
 
 ```shell
-usage: aprxc [-h] [--top TOP] [--size SIZE] [--epsilon EPSILON] [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--debug]
+usage: aprxc [-h] [--top TOP] [--size SIZE] [--epsilon EPSILON] [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--debug] [path ...]
 
-Get an *estimation* of distinct lines in a data stream.
+Estimate the number of distinct lines in a file or stream.
+
+positional arguments:
+  path                  Input file path(s) and/or '-' for stdin (default: stdin)
 
 options:
   -h, --help            show this help message and exit
-  --top TOP, -t TOP     EXPERIMENTAL: Show X most common values (default: 0)
-  --size SIZE, -s SIZE  Total amount of data items, if known in advance. (Can be approximated.) (default: 9223372036854775807)
+  --top TOP, -t TOP     EXPERIMENTAL: Show X most common values
+  --size SIZE, -s SIZE  Total amount of data items, if known in advance. (Can be approximated.)
   --epsilon EPSILON, -E EPSILON
   --delta DELTA, -D DELTA
-  --cheat, --no-cheat   Use 'total seen' number as upper bound for unique count. (default: True)
+  --cheat, --no-cheat   Use 'total seen' number as upper bound for unique count.
   --verbose, -v
   --debug
 ```
