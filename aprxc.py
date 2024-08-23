@@ -35,7 +35,7 @@ class ApproxiCount:
         _debug: bool = False,
     ) -> None:
 
-        self.n = min(m, int(math.ceil((12 / e**2) * math.log((8 * m) / d, 2))))
+        self.n = min(m, int(math.ceil((12 / e**2) * math.log2((8 * m) / d))))
         self._round: int = 0
         self._total: int = 0
         self._memory: set[Hashable] = set()
