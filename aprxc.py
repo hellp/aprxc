@@ -5,13 +5,13 @@
 # https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
 # SPDX-License-Identifier: EUPL-1.2
 
-from collections import Counter
-from collections.abc import Hashable
-from random import getrandbits
-from typing import Self
 import argparse
 import math
 import sys
+from collections import Counter
+from collections.abc import Hashable, Iterable
+from random import getrandbits
+from typing import Self
 
 
 class ApproxiCount:
