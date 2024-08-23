@@ -33,22 +33,22 @@ class ApproxiCount:
         top: int = 0,
         cheat: bool = True,
         _debug: bool = False,
-    ):
+    ) -> None:
 
         self.n = min(m, int(math.ceil((12 / e**2) * math.log((8 * m) / d, 2))))
         self._round: int = 0
         self._total: int = 0
-        self._memory = set()
+        self._memory: set[Hashable] = set()
 
         self.cheat = cheat
         self.top = top
-        self._counters = Counter()
+        self._counters: Counter = Counter()
 
         self._debug = _debug
         self._mean_inacc = 0.0
         self._max_inacc = 0.0
 
-    def count(self, item: Hashable):
+    def count(self, item: Hashable) -> None:
         self._total += 1
 
         if getrandbits(self._round) == 0:
@@ -67,7 +67,7 @@ class ApproxiCount:
         if self._debug:
             self._print_debug()
 
-    def _print_debug(self):
+    def _print_debug(self) -> None:
         inacc = abs((self._total - self.unique) / self._total)
         self._mean_inacc = (
             (self._mean_inacc * (self._total - 1)) + inacc
@@ -94,12 +94,12 @@ class ApproxiCount:
         # memory set, our reported counts are exact.
         return self._round == 0
 
-    def get_top(self) -> list[(int, str)]:
+    def get_top(self) -> list[tuple[int, str]]:
         # EXPERIMENTAL
         return [(c, item) for item, c in self._counters.most_common(self.top)]
 
     @classmethod
-    def from_iterable(cls, iterable, **kw) -> Self:
+    def from_iterable(cls, iterable: Iterable, /, **kw) -> Self:
         inst = cls(**kw)
         for x in iterable:
             if inst._debug and inst._total > 10_000_000:
