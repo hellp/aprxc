@@ -17,12 +17,12 @@ from typing import Self
 
 class ApproxiCount:
     """
-    A class to approximate the number of distinct values in a stream of elements
-    using the 'F0-Estimator' algorithm by S. Chakraborty, N. V. Vinodchandran
+    A class to estimate the number of distinct elements in an iterable.
+
+    It uses the 'F0-Estimator' algorithm by S. Chakraborty, N. V. Vinodchandran
     and K. S. Meel, as described in their 2023 paper "Distinct Elements in
     Streams: An Algorithm for the (Text) Book"
     (https://arxiv.org/pdf/2301.10191#section.2).
-
     """
 
     def __init__(
