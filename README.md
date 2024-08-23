@@ -1,4 +1,4 @@
-# ApproxyCount (`aprxc`)
+# `aprxc` (ApproxiCount)
 
 A Python script/class to approximate the number of distinct values in a stream
 of elements using the *F0-Estimator* algorithm by S. Chakraborty, N. V.
@@ -8,6 +8,27 @@ Elements in Streams: An Algorithm for the (Text) Book"
 
 It is similar to what the command line pipelines `sort | uniq -c | wc -l`, or
 alternatively `awk '!a[$0]++' | wc -l`, do.
+
+## Installation
+
+Choose your preferred way:
+
+```shell
+pip install aprxc
+uv tool install aprxc
+```
+
+Or test-run it in an isolated environment first, via [pipx run](https://pipx.pypa.io/) or [uvx](https://docs.astral.sh/uv/concepts/tools/):
+
+```shell
+pipx run aprxc --help
+uvx aprxc --help
+```
+
+Lastly, as `aprxc.py` has no dependencies besides Python 3.11+, you can simply
+download it, run it, put it your PATH, vendor it, etc.
+
+## Features and shortcomings
 
 Compared to sort/uniq:
 
@@ -26,7 +47,7 @@ and cons are pretty balanced, but overall one can say that `aprxc` performs
 generally better than the alternatives, especially with large data inputs) are
 bought with **an inaccuracy in the reported counts**.
 
-## About inaccuracy
+### About inaccuracy
 
 But how inaccurate? In its default configuration you'll get a **mean inaccuracy
 of about 0,4%**, with occasional **outliers around 1%**. For example, if the
@@ -59,7 +80,7 @@ unique elements are encountered the reported counts are **exact**; only once
 this limit is reached, the 'actual' approximation algorithm kicks in and numbers
 will become estimations.
 
-## Is it useful?
+### Is it useful?
 
 - You have to be okay with the inaccuracies, obviously.
 - However, for small unique counts (less than 80k) the numbers are correct and
@@ -71,7 +92,7 @@ will become estimations.
 - If you are working exploratory and don't care about exact numbers or you will
   round them anyway in the end, this can save you time.
 
-## The experimental 'top most common' feature
+### The experimental 'top most common' feature
 
 I've added a couple of lines of code to support a 'top most common' items
 feature. An alternative to the `sort | uniq -c | sort -rn | head`-pipeline or
@@ -96,7 +117,7 @@ It kinda works, but…
   :)
 - Just try it!
 
-## Command-line interface:
+## Command-line interface
 
 ```shell
 usage: aprxc [-h] [--top TOP] [--size SIZE] [--epsilon EPSILON] [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--debug] [path ...]
