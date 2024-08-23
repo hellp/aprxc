@@ -1,0 +1,12 @@
+*.egg-info
+*.pyc
+.DS_Store
+.cache
+.mypy_cache
+.pytest_cache
+.tox
+.vscode
+.venv*
+build
+dist
+test-data
