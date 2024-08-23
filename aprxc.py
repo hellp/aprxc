@@ -75,10 +75,11 @@ class ApproxiCount:
         ) / self._total
         self._max_inacc = max(self._max_inacc, inacc)
         if self._total % 50_000 == 0:
-            print(
+            sys.stdout.write(
                 f"{self._total=} {self.unique=} {self._round=}"
                 f" {self.n} {len(self._memory)=}"
                 f" {inacc=:.2%} (mean: {self._mean_inacc:.3%} max: {self._max_inacc:.3%})"
+                "\n"
             )
 
     @property
@@ -161,7 +162,7 @@ def run() -> None:
         cheat=config.cheat,
         _debug=config.debug,
     )
-    print(
+    sys.stdout.write(
         " ".join(
             [
                 str(aprxc.unique),
@@ -173,10 +174,11 @@ def run() -> None:
             ]
         ).strip()
     )
+    sys.stdout.write("\n")
     if config.top:
-        print(f"# {config.top} most common:")
+        sys.stdout.write(f"# {config.top} most common:\n")
         for count, item in aprxc.get_top():
-            print(count, item.decode().rstrip())
+            sys.stdout.write(f"{count!s} {item.rstrip()!s}\n")
 
 
 if __name__ == "__main__":
