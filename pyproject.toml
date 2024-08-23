@@ -1,6 +1,6 @@
 [project]
 name = "aprxc"
-version = "1.0.0"
+dynamic = ["version"]
 description = "A command-line tool to estimate the number of distinct lines in a file/stream using Chakraborty/Vinodchandran/Meel’s approximation algorithm."
 readme = "README.md"
 authors = [{name = "Fabian Neumann", email = "dev@fabianneumann.de"}]
@@ -40,6 +40,9 @@ exclude = [
   "/test-data",
   "/workspace.code-workspace",
 ]
+
+[tool.hatch.version]
+path = "aprxc.py"
 
 [tool.ruff.lint]
 select = ["ALL"]

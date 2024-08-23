@@ -15,6 +15,8 @@ from random import getrandbits
 from textwrap import dedent
 from typing import Self
 
+__version__ = "1.1.0"
+
 
 class ApproxiCount:
     """
