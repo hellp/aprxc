@@ -130,8 +130,11 @@ def run() -> None:
         "--top",
         "-t",
         type=int,
+        nargs="?",
+        const=10,
         default=0,
-        help="EXPERIMENTAL: Show X most common values",
+        metavar="X",
+        help="EXPERIMENTAL: Show X most common values. Off by default. If enabled, X defaults to 10.",
     )
     parser.add_argument(
         "--size",
