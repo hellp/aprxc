@@ -10,6 +10,7 @@ import math
 import sys
 from collections import Counter
 from collections.abc import Hashable, Iterable
+from itertools import chain
 from random import getrandbits
 from typing import Self
 
@@ -110,43 +111,49 @@ class ApproxiCount:
 
 Aprxc = ApproxiCount
 
-parser = argparse.ArgumentParser(
-    prog="aprxc",
-    description="Get an *estimation* of distinct lines in a data stream.",
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-)
 
-parser.add_argument(
-    "--top",
-    "-t",
-    type=int,
-    default=0,
-    help="EXPERIMENTAL: Show X most common values",
-)
-parser.add_argument(
-    "--size",
-    "-s",
-    type=int,
-    default=sys.maxsize,
-    help="Total amount of data items, if known in advance. (Can be approximated.)",
-)
-parser.add_argument("--epsilon", "-E", type=float, default=0.1)
-parser.add_argument("--delta", "-D", type=float, default=0.1)
-parser.add_argument(
-    "--cheat",
-    action=argparse.BooleanOptionalAction,
-    default=True,
-    help="Use 'total seen' number as upper bound for unique count.",
-)
-parser.add_argument("--verbose", "-v", action="store_true")
-parser.add_argument("--debug", action="store_true")
+def run() -> None:
+    parser = argparse.ArgumentParser(
+        prog="aprxc",
+        description="Estimate the number of distinct lines in a file or stream.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "path",
+        type=argparse.FileType("r"),
+        default=[sys.stdin],
+        nargs="*",
+        help="Input file path(s) and/or '-' for stdin",
+    )
+    parser.add_argument(
+        "--top",
+        "-t",
+        type=int,
+        default=0,
+        help="EXPERIMENTAL: Show X most common values",
+    )
+    parser.add_argument(
+        "--size",
+        "-s",
+        type=int,
+        default=sys.maxsize,
+        help="Total amount of data items, if known in advance. (Can be approximated.)",
+    )
+    parser.add_argument("--epsilon", "-E", type=float, default=0.1)
+    parser.add_argument("--delta", "-D", type=float, default=0.1)
+    parser.add_argument(
+        "--cheat",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Use 'total seen' number as upper bound for unique count.",
+    )
+    parser.add_argument("--verbose", "-v", action="store_true")
+    parser.add_argument("--debug", action="store_true")
 
-config = parser.parse_args()
+    config = parser.parse_args()
 
-
-if __name__ == "__main__":
     aprxc = ApproxiCount.from_iterable(
-        sys.stdin.buffer,
+        chain.from_iterable(config.path),
         m=config.size,
         e=config.epsilon,
         d=config.delta,
@@ -170,3 +177,7 @@ if __name__ == "__main__":
         print(f"# {config.top} most common:")
         for count, item in aprxc.get_top():
             print(count, item.decode().rstrip())
+
+
+if __name__ == "__main__":
+    run()
