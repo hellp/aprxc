@@ -15,7 +15,7 @@ from random import getrandbits
 from textwrap import dedent
 from typing import Self
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 
 class ApproxiCount:
@@ -99,7 +99,7 @@ class ApproxiCount:
         # memory set, our reported counts are exact.
         return self._round == 0
 
-    def get_top(self) -> list[tuple[int, str]]:
+    def get_top(self) -> list[tuple[int, bytes]]:
         # EXPERIMENTAL
         return [(c, item) for item, c in self._counters.most_common(self.top)]
 
@@ -136,7 +136,7 @@ def run() -> None:
     )
     parser.add_argument(
         "path",
-        type=argparse.FileType("r"),
+        type=argparse.FileType("rb"),
         default=[sys.stdin],
         nargs="*",
         help="Input file path(s) and/or '-' for stdin (default: stdin)",
@@ -195,8 +195,10 @@ def run() -> None:
     sys.stdout.write("\n")
     if config.top:
         sys.stdout.write(f"# {config.top} most common:\n")
-        for count, item in aprxc.get_top():
-            sys.stdout.write(f"{count!s} {item.rstrip()!s}\n")
+        for count, value in aprxc.get_top():
+            s: str = value.decode("utf-8", "backslashreplace")
+            s = s.strip()
+            sys.stdout.write(f"{count!s} {s}\n")
 
 
 if __name__ == "__main__":
