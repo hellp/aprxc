@@ -15,7 +15,7 @@ from random import getrandbits
 from textwrap import dedent
 from typing import Self
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 
 class ApproxiCount:
@@ -137,7 +137,7 @@ def run() -> None:
     parser.add_argument(
         "path",
         type=argparse.FileType("rb"),
-        default=[sys.stdin],
+        default=[sys.stdin.buffer],
         nargs="*",
         help="Input file path(s) and/or '-' for stdin (default: stdin)",
     )
