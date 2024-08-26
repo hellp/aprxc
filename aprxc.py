@@ -15,7 +15,7 @@ from random import getrandbits
 from textwrap import dedent
 from typing import Self
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 
 class ApproxiCount:
@@ -167,6 +167,9 @@ def run() -> None:
         help="Use 'total seen' number as upper bound for unique count.",
     )
     parser.add_argument("--verbose", "-v", action="store_true")
+    parser.add_argument(
+        "--version", "-V", action="version", version=f"%(prog)s {__version__}"
+    )
     parser.add_argument("--debug", action="store_true")
 
     config = parser.parse_args()

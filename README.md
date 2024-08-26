@@ -124,7 +124,8 @@ It kinda works, but…
 
 ```shell
 usage: aprxc [-h] [--top [X]] [--size SIZE] [--epsilon EPSILON]
-             [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--debug]
+             [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--version]
+             [--debug]
              [path ...]
 
 Estimate the number of distinct lines in a file or stream.
@@ -144,6 +145,7 @@ options:
   --cheat, --no-cheat   Use 'total seen' number as upper bound for unique
                         count.
   --verbose, -v
+  --version, -V         show program's version number and exit
   --debug
 ```
 
