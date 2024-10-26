@@ -46,7 +46,7 @@ class ApproxiCount:
 
         self.cheat = cheat
         self.top = top
-        self._counters: Counter = Counter()
+        self._counters: Counter[int] = Counter()
 
         self._debug = _debug
         self._mean_inacc = 0.0
@@ -91,7 +91,7 @@ class ApproxiCount:
         # normally it overestimates in 50%, and underestimates in 50% of cases.
         # But as we count the total number of items seen, we can use that as an
         # upper bound of possible unique values.
-        result = int(len(self._memory) / (1 / 2 ** (self._round)))
+        result: int = int(len(self._memory) / (1 / 2 ** (self._round)))
         return min(self._total, result) if self.cheat else result
 
     def is_exact(self) -> bool:
@@ -174,7 +174,7 @@ def run() -> None:
 
     config = parser.parse_args()
 
-    aprxc = ApproxiCount.from_iterable(
+    aprxc: ApproxiCount = ApproxiCount.from_iterable(
         chain.from_iterable(config.path),
         m=config.size,
         e=config.epsilon,
