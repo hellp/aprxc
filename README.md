@@ -1,16 +1,15 @@
-# `aprxc` (ApproxiCount)
+# aprxc
 
-A command-line tool (and Python class) to approximate the number of distinct
-elements in files (or a stream) using the *F0-Estimator* algorithm by S.
-Chakraborty, N. V. Vinodchandran and K. S. Meel, as described in their 2023
-paper "Distinct Elements in Streams: An Algorithm for the (Text) Book"
-(https://arxiv.org/pdf/2301.10191#section.2).
+A command-line tool (and Python class) to approximately count the number of
+distinct elements in files (or a stream/pipe) using the “simple, intuitive,
+sampling-based space-efficient algorithm” by S. Chakraborty, N. V. Vinodchandran
+and K. S. Meel, as described in their 2023 paper [Distinct Elements in Streams:
+An Algorithm for the (Text) Book](https://arxiv.org/pdf/2301.10191#section.2).
 
-**Motivation (elevator pitch):** Easier to remember and always faster than `sort
-| uniq -c | wc -l`. Uses a fixed amount of memory for huge datasets, unlike the
-ever-growing footprint of `awk '!a[$0]++' | wc -l`. Counts accurately for the
-first ~83k unique elements (on 64-bit systems), with a deviation of about 0.4–1%
-after that.
+**Motivation:** Easier to remember, always faster and (much) less
+memory-intensive than `sort | uniq | wc -l` or `awk '!a[$0]++' | wc -l`. In this
+implementation’s default configuration results are precise until ~83k unique
+values (on 64-bit CPUs), with deviations of commonly 0.4-1% afterwards.
 
 ## Installation
 
@@ -21,7 +20,8 @@ pip install aprxc
 uv tool install aprxc
 ```
 
-Or test-run it in an isolated environment first, via [pipx run](https://pipx.pypa.io/) or [uvx](https://docs.astral.sh/uv/concepts/tools/):
+Alternatively, run it in an isolated environment, using [pipx
+run](https://pipx.pypa.io/) or [uvx](https://docs.astral.sh/uv/concepts/tools/):
 
 ```shell
 pipx run aprxc --help
@@ -29,71 +29,101 @@ uvx aprxc --help
 ```
 
 Lastly, as `aprxc.py` has no dependencies besides Python 3.11+, you can simply
-download it, run it, put it your PATH, vendor it, etc.
+download the script, run it, put it your PATH, vendor it, etc.
 
 ## Features and shortcomings
 
-Compared to sort/uniq:
+* Easier to remember than the pipe constructs.
+* 20–60% faster than sort/uniq.
+* 30–99% less memory-intensive than sort/uniq (for mid/high-cardinality data)
+* (Roughly double these numbers when compared against awk.)
+* Memory usage has a (configurable) upper bound.
 
-- sort/uniq always uses less memory (about 30-50%).
-- sort/uniq is about 5 times *slower*.
-
-Compared to 'the awk construct':
-
-- awk uses about the same amount of time (0.5x-2x).
-- awk uses *much more* memory for large files. Basically linear to the file
-    size, while ApproxiCount has an upper bound. For typical multi-GiB files
-    this can mean factors of 20x-150x, e.g. 5GiB (awk) vs. 40MiB (aprxc).
-
-Now let's address the elephant in the room: All these advantages (yes, the pro
-and cons are pretty balanced, but overall one can say that `aprxc` performs
-generally better than the alternatives, especially with large data inputs) are
-bought with **an inaccuracy in the reported counts**.
+Now let's address the elephant in the room: These advantages are bought with
+**an inaccuracy in the reported results**. But how inaccurate?
 
 ### About inaccuracy
 
-But how inaccurate? In its default configuration you'll get a **mean inaccuracy
-of about 0,4%**, with occasional **outliers around 1%**. For example, if the
-script encounters 10M (`10_000_000`) actual unique values, the reported count is
-typically ~40k off (e.g. `10_038_680`), sometimes ~100k (e.g. `9_897_071`).
+In its default configuration the algorithm has a **mean inaccuracy of about
+0.4%**, with **outliers around 1%**. For example, if the script encounters 10M
+(`10_000_000`) actual unique values, the reported count is typically ~40k off
+(e.g. `10_038_680`), sometimes ~100k (e.g. `9_897_071`).
+
+**However:** If the number of encountered actual unique elements is smaller than
+the size of the internally used set data structure, then the reported counts are
+**exact**; only once this limit is reached, the approximation algorithm 'kicks
+in' and the result will become an approximation.
 
 Here's an overview (highly unscientific!) of how the algorithm parameters 𝜀 and
 𝛿 (`--epsilon` and `--delta` on the command line) affect the inaccuracy. The
-defaults of `0.1` for both values seem to strike a good balance (and a memorable
+default of `0.1` for both values seems to strike a good balance (and a memorable
 inaccuracy of ~1%). Epsilon is the 'main manipulation knob', and you can see
 quite good how its value affects especially the maximum inaccuracy.
 
-(For this overview I counted 10 million unique 32-character strings[^1], and _for
-each_ iteration I checked the reported count and compared to the actual number
-of unique items. 'Mean inacc.' is the mean inaccuracy across all 10M steps;
-'max inacc.' is the highest off encountered; memory usage is the linux tool
-`time`'s reported 'maxresident'; time usage is wall time.)
+For this first table I counted 10 million unique 32-character strings, and for
+each iteration checked the reported count and compared to the actual number of
+unique items. _Mean inacc._ is the mean inaccuracy across all 10M steps; _max
+inacc._ is the highest deviation encountered; _memory usage_ is the linux tool
+`time`'s reported _maxresident_; _time usage_ is wall time.
 
-|   𝜀  |  𝛿  | set size | mean inacc. | max inacc.  |   memory usage  |  time usage  |
-| ---- | --- | --------:| ----------- | ----------- | ---------------:| ------------:|
-| 0.01 | 0.1 |  8318632 |     0.004%  |     0.034%  | 1155MiB (4418%) | 12.5s (162%) |
-| 0.05 | 0.1 |   332746 |     0.17%   |     0.43%   |   70MiB  (269%) |  9.5s (123%) |
-| 0.1  | 0.1 |    83187 |   __0.37%__ |   __0.97%__ |   26MiB  (100%) |  7.7s (100%) |
-| 0.2  | 0.1 |    20797 |     0.68%   |     2.16%   |   17MiB   (65%) |  7.3s  (95%) |
-| 0.5  | 0.5 |     3216 |     1.75%   |     5.45%   |   13MiB   (36%) |  8.8s (114%) |
+| tool (w/ options)     | memory [MiB]|    time [s]|mean ina.| max ina.|   set size|
+|-----------------------|------------:|-----------:|--------:|--------:|----------:|
+|`sort \| uniq \| wc -l`| 1541 (100%) |  5.5 (100%)|      0% |      0% |          —|
+|`sort --parallel=16`   | 1848 (120%) |  5.2 ( 95%)|      0% |      0% |          —|
+|`sort --parallel=1`    |  780 ( 51%) | 18.1 (328%)|      0% |      0% |          —|
+|`aprxc --epsilon=0.001`| 1044 ( 68%) |  4.1 ( 75%)|      0% |      0% |831_863_138|
+|`aprxc --epsilon=0.01` | 1137 ( 74%) |  5.5 (100%)|  0.001% |   0.02% |  8_318_632|
+|`aprxc --epsilon=0.05` |   78 (  5%) |  2.2 ( 40%)|  0.080% |   0.42% |    332_746|
+|`aprxc` (Python 3.13)  |   35 (  2%) |  1.8 ( 32%)|  0.400% |   1.00% |     83_187|
+|`aprxc` (Python 3.12)  |   28 (  2%) |  2.0 ( 36%)|  0.400% |   1.00% |     83_187|
+|`aprxc --epsilon=0.2`  |   26 (  2%) |  1.8 ( 32%)|  0.700% |   2.10% |     20_797|
+|`aprxc --epsilon=0.5`  |   23 (  1%) |  1.7 ( 31%)|  1.700% |   5.40% |      3_216|
+|`awk '!a[$0]++'\|wc -l`| 3094 (201%) |  9.3 (169%)|      0% |      0% |          —|
 
-**Important (and nice feature):** In its default configuration, the algorithm
-uses a set data structure with 83187 slots, meaning that until that number of
-unique elements are encountered the reported counts are **exact**; only once
-this limit is reached, the 'actual' approximation algorithm kicks in and numbers
-will become estimations.
+
+#### Other time/memory consumption benchmarks
+
+For `linux-6.11.6.tar`, a medium-cardinality (total: 39_361_138, 43.3% unique)
+input file:
+
+| tool (w/ options)     | memory [MiB]|    time [s]|
+|-----------------------|------------:|-----------:|
+|`sort \| uniq \| wc -l`| 6277 (100%) | 41.4 (100%)|
+|`sort --parallel=16`   | 7477 (119%) | 36.7 ( 89%)|
+|`sort --parallel=1`    | 3275 ( 52%) |158.6 (383%)|
+|`aprxc --epsilon=0.001`| 2081 ( 33%) | 13.1 ( 32%)|
+|`aprxc --epsilon=0.01` | 1364 ( 22%) | 15.3 ( 37%)|
+|`aprxc --epsilon=0.05` |  105 (  2%) |  8.2 ( 20%)|
+|`aprxc` (Python 3.13)  |   39 (  1%) |  7.2 ( 17%)|
+|`aprxc` (Python 3.12)  |   35 (  1%) |  8.1 ( 20%)|
+|`aprxc --epsilon=0.2`  |   27 (  0%) |  7.2 ( 17%)|
+|`aprxc --epsilon=0.5`  |   23 (  0%) |  7.2 ( 17%)|
+|`awk '!a[$0]++'\|wc -l`| 5638 ( 90%) | 24.8 ( 60%)|
+
+For `cut -f 1 clickstream-enwiki-2024-04.tsv`, a low-cardinality (total:
+34_399_603, unique: 6.4%), once via temporary file¹, once via pipe²:
+
+| tool (w/ options)     |   ¹mem [MiB]|   ¹time [s]|   ²mem [MiB]|   ²time [s]|
+|-----------------------|------------:|-----------:|------------:|-----------:|
+|`sort \| uniq \| wc -l`| 4823 (100%) | 11.6 (100%)|   14 (100%) | 50.3 (100%)|
+|`sort --parallel=16`   | 5871 (122%) | 11.9 (103%)|   14 (100%) | 48.7 ( 97%)|
+|`sort --parallel=1`    | 2198 ( 46%) | 50.5 (436%)|   10 ( 71%) | 48.7 ( 97%)|
+|`aprxc --epsilon=0.001`|  214 (  4%) | 10.8 ( 93%)|  215 (1532%)| 10.7 ( 21%)|
+|`aprxc --epsilon=0.01` |  215 (  4%) | 10.5 ( 91%)|  215 (1534%)| 10.6 ( 21%)|
+|`aprxc --epsilon=0.05` |   73 (  2%) |  8.2 ( 71%)|   73 (524%) |  7.7 ( 15%)|
+|`aprxc` (Python 3.13)  |   35 (  1%) |  6.4 ( 55%)|   36 (254%) |  6.5 ( 13%)|
+|`aprxc` (Python 3.12)  |   29 (  1%) |  7.4 ( 64%)|   29 (204%) |  7.2 ( 14%)|
+|`aprxc --epsilon=0.2`  |   27 (  1%) |  5.8 ( 50%)|   27 (189%) |  5.8 ( 11%)|
+|`aprxc --epsilon=0.5`  |   23 (  0%) |  6.0 ( 52%)|   23 (164%) |  6.1 ( 12%)|
+|`awk '!a[$0]++'\|wc -l`|  666 ( 14%) | 15.7 (136%)|  666 (4748%)| 14.4 ( 29%)|
 
 ### Is it useful?
 
-- You have to be okay with the inaccuracies, obviously.
-- However, for small unique counts (less than 80k) the numbers are accurate and
-  the command might be easier to remember than the sort/uniq pipe or the awkward
-  awk construct.
-- It's basically always faster than the sort/uniq pipe.
-- If you are memory-constrained and want to deal with large files, it might be
-  an option.
-- If you are working exploratory and don't care about exact numbers or you will
-  round them anyway in the end, this can save you time.
+You have to accept the inaccuracies, obviously. But if you are working
+exploratory and don't care about exact number or plan to round or throw them
+away anyway; or if or you are in a memory-constrained situation and need to deal
+with large input files or streaming data; or if you just cannot remember the
+multi-command pipe alternatives, then this might be a tool for you.
 
 ### The experimental 'top most common' feature
 
@@ -124,11 +154,11 @@ It kinda works, but…
 
 ```shell
 usage: aprxc [-h] [--top [X]] [--size SIZE] [--epsilon EPSILON]
-             [--delta DELTA] [--cheat | --no-cheat] [--verbose] [--version]
+             [--delta DELTA] [--cheat] [--count-total] [--verbose] [--version]
              [--debug]
              [path ...]
 
-Estimate the number of distinct lines in a file or stream.
+Aproximately count the number of distinct lines in a file or pipe.
 
 positional arguments:
   path                  Input file path(s) and/or '-' for stdin (default:
@@ -138,22 +168,18 @@ options:
   -h, --help            show this help message and exit
   --top [X], -t [X]     EXPERIMENTAL: Show X most common values. Off by
                         default. If enabled, X defaults to 10.
-  --size SIZE, -s SIZE  Total amount of data items, if known in advance. (Can
-                        be approximated.)
+  --size SIZE, -s SIZE  Expected (estimated) total number of items. Reduces
+                        memory usages, increases inaccuracy.
   --epsilon EPSILON, -E EPSILON
   --delta DELTA, -D DELTA
-  --cheat, --no-cheat   Use 'total seen' number as upper bound for unique
-                        count.
+  --cheat               Improve accuracy by tracking 'total seen' and use it
+                        as upper bound for result.
+  --count-total, -T     Count number of total seen values.
   --verbose, -v
   --version, -V         show program's version number and exit
-  --debug
-```
-
----
-
-[^1]:
-    The benchmark script:
-
-    ```shell
-    cat /dev/urandom | pv -q -L 1000M | base64 -w 32 | command time ./aprxc.py --debug --epsilon=0.1 --delta=0.1
-    ```
+  --debug               Track, calculate, and display various internal
+                        statistics.
+usage: aprxc [-h] [--top [X]] [--size SIZE] [--epsilon EPSILON]
+             [--delta DELTA] [--cheat] [--verbose] [--version] [--benchmark]
+             [--debug] [--debug-lines N]
+             [path ...]
