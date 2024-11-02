@@ -16,7 +16,7 @@ from random import getrandbits
 from textwrap import dedent
 from typing import Self
 
-__version__ = "2.0.0.dev"
+__version__ = "2.0.0"
 
 
 class Aprxc:
