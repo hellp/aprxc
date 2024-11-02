@@ -179,7 +179,4 @@ options:
   --version, -V         show program's version number and exit
   --debug               Track, calculate, and display various internal
                         statistics.
-usage: aprxc [-h] [--top [X]] [--size SIZE] [--epsilon EPSILON]
-             [--delta DELTA] [--cheat] [--verbose] [--version] [--benchmark]
-             [--debug] [--debug-lines N]
-             [path ...]
+```
