@@ -13,7 +13,7 @@ values (on 64-bit CPUs), with deviations of commonly 0.4-1% afterwards.
 
 ## Installation
 
-Choose your preferred way:
+Choose your preferred way to install it from [PyPI](https://pypi.org/project/aprxc/):
 
 ```shell
 pip install aprxc
