@@ -38,6 +38,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
+  "/benchmark.py",
   "/test-data",
   "/workspace.code-workspace",
 ]
