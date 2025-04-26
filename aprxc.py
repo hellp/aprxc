@@ -231,14 +231,14 @@ def run() -> None:
 
     if config.count_total:
         sys.stdout.write(
-            "".join(["\n", "total: " if config.verbose else "", f"{aprxc._total}"])
+            "".join(["\n", "total: " if config.verbose else "", f"{aprxc.total}"])
         )
         sys.stdout.write(
             "".join(
                 [
                     "\n",
-                    "unique%:" if config.verbose else "",
-                    f"{aprxc.unique/aprxc._total:.3%}",
+                    "unique%: " if config.verbose else "",
+                    f"{aprxc.unique/aprxc.total:.3%}",
                 ]
             )
         )
